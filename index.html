@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Distribuição de Projetos e Avaliadores</title>
+
+  <!-- jsPDF e depois o plugin AutoTable (ordem importante) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px auto; max-width: 900px; background: #f9f9f9; color: #333; }
+    h1 { text-align: center; color: #444; }
+    label { font-weight: bold; display: block; margin-top: 15px; }
+    textarea, input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    button { margin-top: 12px; padding: 10px 15px; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; background: #4CAF50; color: white; }
+    button:hover { background: #45a049; }
+    table { margin-top: 16px; width: 100%; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #eee; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <h1>Distribuição de Projetos e Avaliadores</h1>
+
+  <label for="salas">Quantidade de salas:</label>
+  <input type="number" id="salas" min="1" value="2">
+
+  <label for="grupos">Digite os grupos (um por linha):</label>
+  <textarea id="grupos" rows="6"></textarea>
+
+  <label for="avaliadores">Digite os avaliadores (um por linha):</label>
+  <textarea id="avaliadores" rows="6"></textarea>
+
+  <label for="jsonFile">Ou carregue um arquivo JSON (com propriedades "trabalhos" e "avaliadores"):</label>
+  <input type="file" id="jsonFile" accept=".json">
+
+  <div class="actions">
+    <button onclick="gerarDistribuicao()">Gerar Distribuição</button>
+    <button onclick="exportarCSV()">Exportar CSV</button>
+    <button onclick="exportarPDF()">Exportar PDF</button>
+    <button onclick="carregarBase()">BASE DE DADOS 2025</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    const base2025Grupos = [
+    { "grupos": "BAIXAS CONCENTRAÇÕES DO EXTRATO METANÓLICO DE Osmundaria obtusiloba INIBEM A CONIDIAÇÃO SECUNDÁRIA in vitro DO FUNGO Colletotrichum abscissum, AGENTE CAUSAL DA PODRIDÃO FLORAL DOS CITROS " },
+    { "grupos": "POTENCIAL DO VALE DO RIBEIRA PARA CAFÉS ESPECIAIS: A VALIAÇÃO DE CULTIV ARES DE COFFEA ARABICA " },
+    { "grupos": "HIDROLATO DE EUCALIPTO CITRIODORA, ASSOCIADO OU NÃO A BIOFILME DE AMIDO DE MILHO, NO CONTROLE DA ANTRACNOSE DO MAMOEIRO " },
+    { "grupos": "AVALIAÇÃO DE HOMOGENEIDADE DE ÁREA COM PRODUÇÃO DE MILHO VERDE " },
+    { "grupos": "QUALIDADE DE BEBIDA DE CLONES DE COFFEA CANEPHORA EM CONDIÇÕES DE AMBIENTE SUBTROPICAL ÚMIDO, VALE DO RIBEIRA-SP, BRASIL " },
+    { "grupos": "APLICAÇÃO VIA CACHO DE FERTILIZANTES COM BIOESTIMULANTES NA CULTURA DA BANANA NO INVERNO/PRIMAVERA " },
+    { "grupos": "Influência da fertilidade do solo na fitossociologia e estoques de carbono em áreas de mata atlântica em processo de restauração ecológica " },
+    { "grupos": "EFEITO DO EXTRATO AQUOSO DE CROTALÁRIA(Crotalária ochroleuca) SOBRE Sitophilus zeamais(COLEOPTERA:CURCULIONIDAE) " },
+    { "grupos": "PARAMETRIZAÇÃO DO MODELO CROPGRO-PERENNIAL FORAGE PARA ESTIMATIVA DA MASSA DE FORRAGEM DO CAPIM-IPYPORÃ " },
+    { "grupos": "ADUBAÇÃO BASEADA NO ÍNDICE DE SUFICIÊNCIA DE NITROGÊNIO INFLUENCIANDO A PRODUTIVIDADE E A QUALIDADE DE FRUTOS DA BANANEIRA GRAND NAINE " },
+    { "grupos": "ATRIBUTOS QUÍMICOS DO SOLO EM BANANAL ADUBADO DE ACORDO COM O ÍNDICE DE SUFICIÊNCIA DE NITROGÊNIO (SEGUNDO CICLO) " },
+    { "grupos": "CALIBRAÇÃO DA TEMPERATURA E UMIDADE DO AR DE SISTEMA IoT APLICADO AO MONITORAMENTO AMBIENTAL DO “CHILLING” DA BANANA " },
+    { "grupos": "TECNOLOGIAS AUXILIARES DA ADUBAÇÃO NA PRODUÇÃO E QUALIDADE DE FRUTOS DA CULTIVAR VTP HAYASHI – PRIMEIRO CICLO " },
+    { "grupos": "Estoques de C e N e sua Relação com a Resistência do Solo à Ruptura, em Terras Pretas de Índio da Amazônia Central " },
+    { "grupos": "EFEITO DO COBRE NA ESTABILIDADE E AGREGAÇÃO DA HEMOGLOBINA EXTRACELULAR DE Amynthas gracilis (HbAg) " },
+    { "grupos": "PROCESSAMENTO DIGITAL DE IMAGENS PARA IDENTIFICAÇÃO DE DEFICIÊNCIA DE POTÁSSIOEM BANANEIRAS COM VALIDAÇÃO EM CAMPO " },
+    { "grupos": "Processamento Digital de Imagens Para Identificação de Estádios da Sigatoka-Negra em Campo " },
+    { "grupos": "A  ADUBAÇÃO NITROGENADA UTILIZADA NO BANANAL PODE AFETAR A COMPACTAÇÃO DO SOLO? " },
+    { "grupos": "DE RESÍDUO A ALIADO: HIDROLATO À BASE DE Cupressus sp. NO CONTROLE  DO FITOPATOGENO Colletotrichum fructicola " },
+    { "grupos": "“PORTA-ENXERTOS ESPECÍFICOS PARA CULTIVARES DE CAFÉ ARÁBICA EM ÁREA ISENTA DE INFESTAÇÃO POR NEMATOIDES” " },
+    { "grupos": "AFERIÇÃO DE PONTAS DE PULVERIZAÇÃO ACIONADAS   POR UM PULVERIZADOR COSTAL MANUAL " },
+    { "grupos": "AÇÃO DO EXTRATO AQUOSO DE CATAIA (Pimenta Pseudocaryophyllus) NO DESENVOLVIMENTO LARVAL DE Spodoptera eridania (LEPIDOPTERA: NOCTUIDAE) " },
+    { "grupos": "APRENDIZAGEM DE TÉCNICAS LABORATORIAIS EM ENTOMOLOGIA AGRÍCOLA: CRIAÇÃO DE LAGARTA-DAS-FOLHAS (Spodoptera eridania) EM LABORATÓRIO " },
+    { "grupos": "APRENDIZAGEM DE TÉCNICAS LABORATORIAIS EM ENTOMOLOGIA AGRÍCOLA: CRIAÇÃO DE PERCEVEJO-MARROM-DA-SOJA (Euschistus heros) EM LABORATÓRIO " },
+    { "grupos": "PERÍODO DE INCUBAÇÃO DA ANTRACNOSE (Colletotrichum fructicola) EM FRUTOS  DE MAMÃO (Carica papaya) TRATADOS NA PÓS-COLHEITA COM HIDROLATO DE EUCALIPTO CITRIODORA (Corymbia citriodora) " },
+    { "grupos": "SUBSTRATO PARA A PRODUÇÃO DE MUDAS FLORESTAISCOM RESÍDUOS DA  AGROINDÚSTRIA DA POLPA DE JUÇARA " },
+    { "grupos": "ASSIMILAÇÃO DE CO2 E SATURAÇÃO DE LUZ DO CAPIM-IPYPORÃ AFETADO PELA FIXAÇÃO NÃO SIMBIÓTICA DE NITROGÊNIO " },
+    { "grupos": "Efeito do tratamento do cacho da bananeira com a auxina 2,4-D e Zinco no inverno " },
+    { "grupos": "BIOATIVIDADE DO EXTRATO AQUOSO DE FRUTOS DE CAJÁ-MANGA SOBRE O  DESENVOLVIMENTO LARVAL DE SPODOPTERA ERIDANIA " },
+    { "grupos": "DINÂMICA DE LIXIVIAÇÃO DE HERBICIDAS PRÉ - EMERGENTES " },
+    { "grupos": "PRODUTIVIDADE DA CULTURA DA BANANA NO PRIMEIRO CICLO, APÓS O  MANEJO DA APLICAÇÃO DE NITROGÊNIO, TENDO COMO BASE A MEDIDA  INDIRETA DE CLOROFILA " },
+    { "grupos": "BIOMARCADORES COMPORTAMENTAIS DE NEUROTOXICIDADE EM LARVAS DE ZEBRAFISH (Danio rerio) EXPOSTAS AO HERBICIDA ROUNDUP® TRANSORB " },
+    { "grupos": "TAXA DE CRESCIMENTO DE BANANEIRAS EM RESPOSTA AO EFEITO DE HORMESE " }
+  ];
+
+  const base2025Avaliadores = [
+    { "avaliadroes": "Alex Mendonça de Carvalho " },
+    { "avaliadroes": "Ana Letícia Madeira Sanches " },
+    { "avaliadroes": "Andressa Rubim Lopes " },
+    { "avaliadroes": "Bruna Roque Loureiro " },
+    { "avaliadroes": "Caetano Afonso Lanzoni Troiani " },
+    { "avaliadroes": "Danilo Eduardo Rozane " },
+    { "avaliadroes": "Eduardo Antônio Sanches " },
+    { "avaliadroes": "Eduardo Nardini Gomes " },
+    { "avaliadroes": "Érico Tadao Teramoto " },
+    { "avaliadroes": "Erik de Lima Andrade " },
+    { "avaliadroes": "Fagner Junior Gomes " },
+    { "avaliadroes": "Felippe Alexandre Lisboa de Miranda Daros " },
+    { "avaliadroes": "Francisca Alcivania de Melo Silva " },
+    { "avaliadroes": "Giovana Bertini " },
+    { "avaliadroes": "Gláucia Maria Pereira Pavarini " },
+    { "avaliadroes": "Guilherme Wolff Bueno " },
+    { "avaliadroes": "Hugo do Nascimento Bendini " },
+    { "avaliadroes": "Joao Vicente Coffani Nunes " },
+    { "avaliadroes": "Juliana Domingues Lima " },
+    { "avaliadroes": "Kelly Botigeli Sevegnani " },
+    { "avaliadroes": "Leandro Jose Grava de Godoy " },
+    { "avaliadroes": "Lilian Cristina Makino " },
+    { "avaliadroes": "Luís Carlos Ferreira de Almeida " },
+    { "avaliadroes": "Marcelo Vieira Ferraz " },
+    { "avaliadroes": "Marília Cunha Lignon " },
+    { "avaliadroes": "Patricia Gleydes Morgante " },
+    { "avaliadroes": "Rafael Vilhena Reis Neto " },
+    { "avaliadroes": "Ronaldo Pavarini " },
+    { "avaliadroes": "Santiago Montealegre Quijano " },
+    { "avaliadroes": "Wilson Jose Oliveira de Souza " }
+  ];
+
+
+
+    // preenche textareas com base
+    function carregarBase() {
+      const gruposText = base2025Grupos.map(item => item.grupos).filter(Boolean).join("\n");
+      const avaliadoresText = base2025Avaliadores.map(item => item.avaliadroes).filter(Boolean).join("\n");
+      document.getElementById("grupos").value = gruposText;
+      document.getElementById("avaliadores").value = avaliadoresText;
+    }
+
+    // variáveis globais (podem ser preenchidas por JSON carregado)
+    let trabalhosFromJson = [];
+    let avaliadoresFromJson = [];
+    let distribuicao = [];
+
+    // carregar JSON (opcional) — o JSON deve ter { "trabalhos": [...], "avaliadores": [...] }
+    document.getElementById('jsonFile').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          trabalhosFromJson = data.trabalhos || [];
+          avaliadoresFromJson = data.avaliadores || [];
+          // também preenche os textareas para visualização
+          if (trabalhosFromJson.length) document.getElementById('grupos').value = trabalhosFromJson.join("\n");
+          if (avaliadoresFromJson.length) document.getElementById('avaliadores').value = avaliadoresFromJson.join("\n");
+          alert("JSON carregado com sucesso!");
+        } catch (err) {
+          alert("Erro ao ler JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // shuffle Fisher-Yates
+    function shuffleArray(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // gera e mostra distribuição (lê textareas ou usa JSON carregado)
+    function gerarDistribuicao() {
+      const numSalas = parseInt(document.getElementById('salas').value, 10);
+      if (!numSalas || numSalas < 1) {
+        alert("Digite um número válido de salas.");
+        return;
+      }
+
+      const gruposText = document.getElementById('grupos').value.trim();
+      const avaliadoresText = document.getElementById('avaliadores').value.trim();
+
+      const trabalhos = gruposText
+        ? gruposText.split("\n").map(s => s.trim()).filter(Boolean)
+        : (trabalhosFromJson.length ? trabalhosFromJson.slice() : []);
+
+      const avaliadores = avaliadoresText
+        ? avaliadoresText.split("\n").map(s => s.trim()).filter(Boolean)
+        : (avaliadoresFromJson.length ? avaliadoresFromJson.slice() : []);
+
+      // inicializa distribuição
+      distribuicao = Array.from({ length: numSalas }, () => ({ trabalhos: [], avaliadores: [] }));
+
+      const shuffledTrabalhos = shuffleArray(trabalhos);
+      const shuffledAvaliadores = shuffleArray(avaliadores);
+
+      shuffledTrabalhos.forEach((t, i) => {
+        distribuicao[i % numSalas].trabalhos.push(t);
+      });
+
+      shuffledAvaliadores.forEach((a, i) => {
+        distribuicao[i % numSalas].avaliadores.push(a);
+      });
+
+      mostrarResultadoNaTela();
+    }
+
+    // mostra resultado como tabelas HTML (cada item em sua linha)
+    function mostrarResultadoNaTela() {
+      const div = document.getElementById('resultado');
+      if (!distribuicao.length) {
+        div.innerHTML = "<p>Nenhuma distribuição gerada.</p>";
+        return;
+      }
+      let html = "";
+      distribuicao.forEach((sala, i) => {
+        html += `<h3>Sala ${i + 1}</h3>`;
+        html += `<table><thead><tr><th>Tipo</th><th>Nome</th></tr></thead><tbody>`;
+        if (sala.trabalhos.length === 0 && sala.avaliadores.length === 0) {
+          html += `<tr><td colspan="2"><em>Sem itens</em></td></tr>`;
+        } else {
+          sala.trabalhos.forEach(t => { html += `<tr><td>Trabalho</td><td>${escapeHtml(t)}</td></tr>`; });
+          sala.avaliadores.forEach(a => { html += `<tr><td>Avaliador</td><td>${escapeHtml(a)}</td></tr>`; });
+        }
+        html += `</tbody></table>`;
+      });
+      div.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(text));
+      return div.innerHTML;
+    }
+
+    // export CSV (cada item em linha)
+    function exportarCSV() {
+      if (!distribuicao.length) {
+        alert("Gere a distribuição antes de exportar.");
+        return;
+      }
+      let csv = "Sala,Tipo,Nome\n";
+      distribuicao.forEach((sala, i) => {
+        sala.trabalhos.forEach(t => csv += `"Sala ${i+1}","Trabalho","${t.replace(/"/g,'""')}"\n`);
+        sala.avaliadores.forEach(a => csv += `"Sala ${i+1}","Avaliador","${a.replace(/"/g,'""')}"\n`);
+      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "distribuicao.csv";
+      link.click();
+    }
+
+    // export PDF usando jsPDF + autotable
+    function exportarPDF() {
+      if (!distribuicao.length) {
+        alert("Gere a distribuição antes de exportar.");
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'pt', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 40;
+      const col0 = 90;
+      const col1 = pageWidth - margin * 2 - col0;
+
+      distribuicao.forEach((sala, i) => {
+        if (i > 0) doc.addPage();
+        // título
+        doc.setFontSize(14);
+        doc.text(`Sala ${i + 1}`, margin, 40);
+
+        // montar linhas: cada trabalho/avaliador uma linha
+        const rows = [];
+        sala.trabalhos.forEach(t => rows.push(["Trabalho", t]));
+        sala.avaliadores.forEach(a => rows.push(["Avaliador", a]));
+        if (rows.length === 0) rows.push(["", "Sem itens"]);
+
+        doc.autoTable({
+          startY: 60,
+          head: [["Tipo", "Nome"]],
+          body: rows,
+          theme: "grid",
+          styles: { fontSize: 10, cellPadding: 6, overflow: 'linebreak' },
+          columnStyles: {
+            0: { cellWidth: col0 },
+            1: { cellWidth: col1 }
+          },
+          margin: { left: margin, right: margin }
+        });
+      });
+
+      doc.save("distribuicao.pdf");
+    }
+  </script>
+</body>
+</html>
