@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Distribuição de Projetos e Avaliadores</title>
+  <title>Distribuição de Projetos e avaliadroeses</title>
 
   <!-- jsPDF e depois o plugin AutoTable (ordem importante) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -65,7 +65,7 @@
     </div>
   </header>
   
-  <h1>Distribuição de Projetos e Avaliadores CIC v6</h1>
+  <h1>Distribuição de Projetos e avaliadroeses CIC v7</h1>
 
   <label for="salas">Quantidade de salas:</label>
   <input type="number" id="salas" min="1" value="2">
@@ -73,10 +73,10 @@
   <label for="grupos">Digite os grupos (um por linha):</label>
   <textarea id="grupos" rows="6"></textarea>
 
-  <label for="avaliadores">Digite os avaliadores (um por linha):</label>
-  <textarea id="avaliadores" rows="6"></textarea>
+  <label for="avaliadroeses">Digite os avaliadroeses (um por linha):</label>
+  <textarea id="avaliadroeses" rows="6"></textarea>
 
-  <label for="jsonFile">Ou carregue um arquivo JSON (com propriedades "trabalhos" e "avaliadores"):</label>
+  <label for="jsonFile">Ou carregue um arquivo JSON (com propriedades "trabalhos" e "avaliadroeses"):</label>
   <input type="file" id="jsonFile" accept=".json">
 
   <div class="actions">
@@ -224,34 +224,34 @@
   }
 ];
 
- const base2025Avaliadores = [
-  { "avaliador": "Alex Mendonça de Carvalho" },
-  { "avaliador": "Andressa Rubim Lopes" },
-  { "avaliador": "Bruna Roque Loureiro" },
-  { "avaliador": "Caetano Afonso Lanzoni Troiani" },
-  { "avaliador": "Danilo Eduardo Rozane" },
-  { "avaliador": "Eduardo Antônio Sanches" },
-  { "avaliador": "Eduardo Nardini Gomes" },
-  { "avaliador": "Érico Tadao Teramoto" },
-  { "avaliador": "Erik de Lima Andrade" },
-  { "avaliador": "Fagner Junior Gomes" },
-  { "avaliador": "Felippe Alexandre Lisboa de Miranda Daros" },
-  { "avaliador": "Francisca Alcivania de Melo Silva" },
-  { "avaliador": "Giovana Bertini" },
-  { "avaliador": "Gláucia Maria Pereira Pavarini" },
-  { "avaliador": "Guilherme Wolff Bueno" },
-  { "avaliador": "Joao Vicente Coffani Nunes" },
-  { "avaliador": "Juliana Domingues Lima" },
-  { "avaliador": "Kelly Botigeli Sevegnani" },
-  { "avaliador": "Leandro Jose Grava de Godoy" },
-  { "avaliador": "Lilian Cristina Makino" },
-  { "avaliador": "Luís Carlos Ferreira de Almeida" },
-  { "avaliador": "Marcelo Vieira Ferraz" },
-  { "avaliador": "Marília Cunha Lignon" },
-  { "avaliador": "Patricia Gleydes Morgante" },
-  { "avaliador": "Ronaldo Pavarini" },
-  { "avaliador": "Santiago Montealegre Quijano" },
-  { "avaliador": "Wilson Jose Oliveira de Souza" }
+ const base2025avaliadroeses = [
+  { "avaliadroes": "Alex Mendonça de Carvalho" },
+  { "avaliadroes": "Andressa Rubim Lopes" },
+  { "avaliadroes": "Bruna Roque Loureiro" },
+  { "avaliadroes": "Caetano Afonso Lanzoni Troiani" },
+  { "avaliadroes": "Danilo Eduardo Rozane" },
+  { "avaliadroes": "Eduardo Antônio Sanches" },
+  { "avaliadroes": "Eduardo Nardini Gomes" },
+  { "avaliadroes": "Érico Tadao Teramoto" },
+  { "avaliadroes": "Erik de Lima Andrade" },
+  { "avaliadroes": "Fagner Junior Gomes" },
+  { "avaliadroes": "Felippe Alexandre Lisboa de Miranda Daros" },
+  { "avaliadroes": "Francisca Alcivania de Melo Silva" },
+  { "avaliadroes": "Giovana Bertini" },
+  { "avaliadroes": "Gláucia Maria Pereira Pavarini" },
+  { "avaliadroes": "Guilherme Wolff Bueno" },
+  { "avaliadroes": "Joao Vicente Coffani Nunes" },
+  { "avaliadroes": "Juliana Domingues Lima" },
+  { "avaliadroes": "Kelly Botigeli Sevegnani" },
+  { "avaliadroes": "Leandro Jose Grava de Godoy" },
+  { "avaliadroes": "Lilian Cristina Makino" },
+  { "avaliadroes": "Luís Carlos Ferreira de Almeida" },
+  { "avaliadroes": "Marcelo Vieira Ferraz" },
+  { "avaliadroes": "Marília Cunha Lignon" },
+  { "avaliadroes": "Patricia Gleydes Morgante" },
+  { "avaliadroes": "Ronaldo Pavarini" },
+  { "avaliadroes": "Santiago Montealegre Quijano" },
+  { "avaliadroes": "Wilson Jose Oliveira de Souza" }
 ];
 
 
@@ -260,17 +260,17 @@
     // preenche textareas com base
     function carregarBase() {
       const gruposText = base2025Grupos.map(item => item.grupos).filter(Boolean).join("\n");
-      const avaliadoresText = base2025Avaliadores.map(item => item.avaliadroes).filter(Boolean).join("\n");
+      const avaliadroesesText = base2025avaliadroeses.map(item => item.avaliadroes).filter(Boolean).join("\n");
       document.getElementById("grupos").value = gruposText;
-      document.getElementById("avaliadores").value = avaliadoresText;
+      document.getElementById("avaliadroeses").value = avaliadroesesText;
     }
 
     // variáveis globais (podem ser preenchidas por JSON carregado)
     let trabalhosFromJson = [];
-    let avaliadoresFromJson = [];
+    let avaliadroesesFromJson = [];
     let distribuicao = [];
 
-    // carregar JSON (opcional) — o JSON deve ter { "trabalhos": [...], "avaliadores": [...] }
+    // carregar JSON (opcional) — o JSON deve ter { "trabalhos": [...], "avaliadroeses": [...] }
     document.getElementById('jsonFile').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -279,10 +279,10 @@
         try {
           const data = JSON.parse(e.target.result);
           trabalhosFromJson = data.trabalhos || [];
-          avaliadoresFromJson = data.avaliadores || [];
+          avaliadroesesFromJson = data.avaliadroeses || [];
           // também preenche os textareas para visualização
           if (trabalhosFromJson.length) document.getElementById('grupos').value = trabalhosFromJson.join("\n");
-          if (avaliadoresFromJson.length) document.getElementById('avaliadores').value = avaliadoresFromJson.join("\n");
+          if (avaliadroesesFromJson.length) document.getElementById('avaliadroeses').value = avaliadroesesFromJson.join("\n");
           alert("JSON carregado com sucesso!");
         } catch (err) {
           alert("Erro ao ler JSON: " + err.message);
@@ -310,18 +310,18 @@
   }
 
   const gruposText = document.getElementById('grupos').value.trim();
-  const avaliadoresText = document.getElementById('avaliadores').value.trim();
+  const avaliadroesesText = document.getElementById('avaliadroeses').value.trim();
 
   const trabalhos = gruposText
     ? gruposText.split("\n").map(s => s.trim()).filter(Boolean)
     : (trabalhosFromJson.length ? trabalhosFromJson.slice() : []);
 
-  const avaliadores = avaliadoresText
-    ? avaliadoresText.split("\n").map(s => s.trim()).filter(Boolean)
-    : (avaliadoresFromJson.length ? avaliadoresFromJson.slice() : []);
+  const avaliadroeses = avaliadroesesText
+    ? avaliadroesesText.split("\n").map(s => s.trim()).filter(Boolean)
+    : (avaliadroesesFromJson.length ? avaliadroesesFromJson.slice() : []);
 
   // inicializa distribuição
-  distribuicao = Array.from({ length: numSalas }, () => ({ trabalhos: [], avaliadores: [] }));
+  distribuicao = Array.from({ length: numSalas }, () => ({ trabalhos: [], avaliadroeses: [] }));
 
   // 🔹 Sala 1 sempre com PIBC1
   distribuicao[0].trabalhos.push("PIBC1");
@@ -329,7 +329,7 @@
   // embaralhar os outros trabalhos, excluindo PIBC1 caso já esteja na lista
   const restantes = trabalhos.filter(t => t !== "PIBC1");
   const shuffledTrabalhos = shuffleArray(restantes);
-  const shuffledAvaliadores = shuffleArray(avaliadores);
+  const shuffledavaliadroeses = shuffleArray(avaliadroeses);
 
   // distribuir os trabalhos a partir da sala 2
   shuffledTrabalhos.forEach((t, i) => {
@@ -337,9 +337,9 @@
     distribuicao[salaIndex].trabalhos.push(t);
   });
 
-  // distribuir avaliadores (3 por sala, sem conflito com orientador)
+  // distribuir avaliadroeses (3 por sala, sem conflito com orientador)
   let salaIndex = 0;
-  shuffledAvaliadores.forEach(avaliador => {
+  shuffledavaliadroeses.forEach(avaliadroes => {
     let tentativas = 0;
     while (tentativas < numSalas) {
       const sala = distribuicao[salaIndex];
@@ -350,10 +350,10 @@
         .map(g => g.orientador);
 
       if (
-        sala.avaliadores.length < 3 &&
-        !orientadoresNaSala.includes(avaliador)
+        sala.avaliadroeses.length < 3 &&
+        !orientadoresNaSala.includes(avaliadroes)
       ) {
-        sala.avaliadores.push(avaliador);
+        sala.avaliadroeses.push(avaliadroes);
         break;
       }
 
@@ -377,11 +377,11 @@
       distribuicao.forEach((sala, i) => {
         html += `<h3>Sala ${i + 1}</h3>`;
         html += `<table><thead><tr><th>Tipo</th><th>Nome</th></tr></thead><tbody>`;
-        if (sala.trabalhos.length === 0 && sala.avaliadores.length === 0) {
+        if (sala.trabalhos.length === 0 && sala.avaliadroeses.length === 0) {
           html += `<tr><td colspan="2"><em>Sem itens</em></td></tr>`;
         } else {
           sala.trabalhos.forEach(t => { html += `<tr><td>Trabalho</td><td>${escapeHtml(t)}</td></tr>`; });
-          sala.avaliadores.forEach(a => { html += `<tr><td>Avaliador</td><td>${escapeHtml(a)}</td></tr>`; });
+          sala.avaliadroeses.forEach(a => { html += `<tr><td>avaliadroes</td><td>${escapeHtml(a)}</td></tr>`; });
         }
         html += `</tbody></table>`;
       });
@@ -403,7 +403,7 @@
       let csv = "Sala,Tipo,Nome\n";
       distribuicao.forEach((sala, i) => {
         sala.trabalhos.forEach(t => csv += `"Sala ${i+1}","Trabalho","${t.replace(/"/g,'""')}"\n`);
-        sala.avaliadores.forEach(a => csv += `"Sala ${i+1}","Avaliador","${a.replace(/"/g,'""')}"\n`);
+        sala.avaliadroeses.forEach(a => csv += `"Sala ${i+1}","avaliadroes","${a.replace(/"/g,'""')}"\n`);
       });
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
@@ -431,10 +431,10 @@
         doc.setFontSize(14);
         doc.text(`Sala ${i + 1}`, margin, 40);
 
-        // montar linhas: cada trabalho/avaliador uma linha
+        // montar linhas: cada trabalho/avaliadroes uma linha
         const rows = [];
         sala.trabalhos.forEach(t => rows.push(["Trabalho", t]));
-        sala.avaliadores.forEach(a => rows.push(["Avaliador", a]));
+        sala.avaliadroeses.forEach(a => rows.push(["avaliadroes", a]));
         if (rows.length === 0) rows.push(["", "Sem itens"]);
 
         doc.autoTable({
