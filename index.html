@@ -9,6 +9,38 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .header-logos {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #ccc;
+    }
+    .header-logos img {
+      max-height: 80px;
+      /* para não exceder o espaço do header */
+      width: auto;
+    }
+    .header-logos .logo-esquerda {
+      /* se quiser, alguma margem ou estilo extra */
+    }
+    .header-logos .logo-direita {
+      /* qualquer ajuste específico para o segundo logo */
+    }
+    @media (max-width: 600px) {
+      .header-logos {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .header-logos img {
+        max-height: 60px;
+      }
+    }
     body { font-family: Arial, sans-serif; margin: 40px auto; max-width: 900px; background: #f9f9f9; color: #333; }
     h1 { text-align: center; color: #444; }
     label { font-weight: bold; display: block; margin-top: 15px; }
