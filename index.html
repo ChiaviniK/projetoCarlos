@@ -65,7 +65,7 @@
     </div>
   </header>
   
-  <h1>Distribuição de Projetos e Avaliadores CIC v5</h1>
+  <h1>Distribuição de Projetos e Avaliadores CIC v6</h1>
 
   <label for="salas">Quantidade de salas:</label>
   <input type="number" id="salas" min="1" value="2">
@@ -323,15 +323,21 @@
   // inicializa distribuição
   distribuicao = Array.from({ length: numSalas }, () => ({ trabalhos: [], avaliadores: [] }));
 
-  const shuffledTrabalhos = shuffleArray(trabalhos);
+  // 🔹 Sala 1 sempre com PIBC1
+  distribuicao[0].trabalhos.push("PIBC1");
+
+  // embaralhar os outros trabalhos, excluindo PIBC1 caso já esteja na lista
+  const restantes = trabalhos.filter(t => t !== "PIBC1");
+  const shuffledTrabalhos = shuffleArray(restantes);
   const shuffledAvaliadores = shuffleArray(avaliadores);
 
-  // distribui trabalhos
+  // distribuir os trabalhos a partir da sala 2
   shuffledTrabalhos.forEach((t, i) => {
-    distribuicao[i % numSalas].trabalhos.push(t);
+    const salaIndex = (i % (numSalas - 1)) + 1; // começa da sala 2
+    distribuicao[salaIndex].trabalhos.push(t);
   });
 
-  // distribui avaliadores (máx. 3 por sala e sem conflito com orientador)
+  // distribuir avaliadores (3 por sala, sem conflito com orientador)
   let salaIndex = 0;
   shuffledAvaliadores.forEach(avaliador => {
     let tentativas = 0;
@@ -343,16 +349,14 @@
         .filter(g => sala.trabalhos.includes(g.grupos))
         .map(g => g.orientador);
 
-      // regra: sala só aceita até 3 avaliadores e não pode ter conflito
       if (
         sala.avaliadores.length < 3 &&
         !orientadoresNaSala.includes(avaliador)
       ) {
         sala.avaliadores.push(avaliador);
-        break; // avaliador alocado
+        break;
       }
 
-      // tenta próxima sala
       salaIndex = (salaIndex + 1) % numSalas;
       tentativas++;
     }
